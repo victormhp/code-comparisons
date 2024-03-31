@@ -1,54 +1,31 @@
 import net from "node:net"
+import { Client } from "./client.js"
+import { Message } from "./message.js"
 
 const CMD_QUIT = "/quit"
-
-const clients = new Map()
 const PORT = 8080
+
+let clients = []
 const server = net.createServer()
 
-function clearLine(socket) {
-   // \x1B[A moves the cursor up one line.
-   // \x1B[2K clears the entire line where the cursor is currently located.
-   socket.write("\x1B[A\x1B[2K")
-}
-
-function broadcast(message, excludeSocket = null) {
-   for (let [socket, client] of clients) {
-      if (client.name !== null && socket !== excludeSocket) {
-         socket.write(message)
-      }
-   }
-}
-
-function parseMessage(socket, data) {
-   const client = clients.get(socket)
-
-   if (client.name === null) {
-      client.name = data
-      socket.write(`\nWelcome ${client.name}!\n`)
-      socket.write(`Type any message to send it, type ${CMD_QUIT} to finish\n\n`)
-      broadcast(`${client.name} joined the chat!\n`, socket)
-   } else if (data === CMD_QUIT) {
-      broadcast(`${client.name} leaved the chat!\n`, socket)
-      clients.delete(socket)
-      socket.end()
-   } else {
-      const message = `[${client.name}] -> ${data}\n`
-      clearLine(socket)
-      broadcast(message)
-   }
-}
-
 server.on('connection', (socket) => {
-   socket.write("Enter your username: ")
-
+   let client = null;
    const address = socket.remoteAddress.replace(/^::ffff:/, '') + ":" + socket.remotePort
    console.log(`[*] ${address} has connected`)
-   clients.set(socket, { name: null, address })
+   socket.write("Enter your username: ")
 
    socket.on('data', (data) => {
-      data = data.toString().trim()
-      parseMessage(socket, data)
+      const text = data.toString().trim()
+      if (client == null) {
+         client = new Client(socket, text, address)
+         clients.push(client)
+         broadcast(`${client.name} joined the chat!\n`, socket)
+         socket.write(`\nWelcome ${client.name}!\n`)
+         socket.write(`Type any message to send it, type ${CMD_QUIT} to finish\n\n`)
+      } else {
+         const message = new Message(client, text)
+         parseMessage(message)
+      }
    })
 
    socket.on('close', () => {
@@ -57,7 +34,7 @@ server.on('connection', (socket) => {
 
    socket.on('error', (err) => {
       console.error("[*] Error:", err)
-      clients.delete(socket)
+      clients = clients.filter(c => c !== client)
       socket.end()
    })
 })
@@ -65,3 +42,31 @@ server.on('connection', (socket) => {
 server.listen(PORT, () => {
    console.log(`[*] Server listening on :${PORT}`)
 })
+
+function parseMessage(message) {
+   const name = message.client.name
+   const socket = message.client.connection
+
+   if (message.message === CMD_QUIT) {
+      broadcast(`${name} leaved the chat!\n`, socket)
+      clients = clients.filter(c => c !== message.client)
+      socket.end()
+   } else {
+      clearLine(socket)
+      broadcast(message.string())
+   }
+}
+
+function broadcast(message, excludeSocket = null) {
+   for (let client of clients) {
+      if (client.name !== null && client.connection !== excludeSocket) {
+         client.connection.write(message)
+      }
+   }
+}
+
+function clearLine(socket) {
+   // \x1B[A moves the cursor up one line.
+   // \x1B[2K clears the entire line where the cursor is currently located.
+   socket.write("\x1B[A\x1B[2K")
+}
