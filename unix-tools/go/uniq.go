@@ -15,7 +15,7 @@ func uniq(files []string ) {
 		for _, arg := range files {
 			f, err := os.Open(arg)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "uniqgo %v\n", err)
+				fmt.Fprintf(os.Stderr, "uniq-go %v\n", err)
 			}
 			countLines(f, counts)
 			f.Close()
