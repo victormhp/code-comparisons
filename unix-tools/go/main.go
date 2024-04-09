@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	CMD_UNIQ = "-uniq"
+	CMD_UNIQ     = "-uniq"
+	CMD_FETCH    = "-fetch"
+	CMD_FETCHALL = "-fetchall"
 )
 
 func main() {
@@ -21,6 +23,10 @@ func main() {
 	switch tool {
 	case CMD_UNIQ:
 		uniq(flags)
+	case CMD_FETCH:
+		fetch(flags)
+	case CMD_FETCHALL:
+		fetchall(flags)
 	default:
 		fmt.Printf("Unknown tool: %s\n", tool)
 		os.Exit(1)
