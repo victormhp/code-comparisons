@@ -1,16 +1,19 @@
 import net from "node:net"
-import { Client } from "./client.js"
-import { Message } from "./message.js"
+import { Client } from "./client.ts"
+import { Message } from "./message.ts"
 
 const CMD_QUIT = "/quit"
 const PORT = 8080
 
-let clients = []
+let clients: Client[] = []
 const server = net.createServer()
 
-server.on('connection', (socket) => {
-   let client = null;
-   const address = socket.remoteAddress.replace(/^::ffff:/, '') + ":" + socket.remotePort
+server.on('connection', (socket: net.Socket) => {
+   let client: Client | null = null;
+   let address = '';
+   if (socket.remoteAddress) {
+      address = address.replace(/^::ffff:/, '') + ":" + socket.remotePort
+   }
    console.log(`[*] ${address} has connected`)
    socket.write("Enter your username: ")
 
@@ -32,7 +35,7 @@ server.on('connection', (socket) => {
       console.log(`[*] ${address} has disconnected`)
    })
 
-   socket.on('error', (err) => {
+   socket.on('error', (err: Error) => {
       console.error("[*] Error:", err)
       clients = clients.filter(c => c !== client)
       socket.end()
@@ -43,7 +46,7 @@ server.listen(PORT, () => {
    console.log(`[*] Server listening on :${PORT}`)
 })
 
-function parseMessage(message) {
+function parseMessage(message: Message) {
    const name = message.client.name
    const socket = message.client.connection
 
@@ -57,7 +60,7 @@ function parseMessage(message) {
    }
 }
 
-function broadcast(message, excludeSocket = null) {
+function broadcast(message: string, excludeSocket: net.Socket | null = null) {
    for (let client of clients) {
       if (client.name !== null && client.connection !== excludeSocket) {
          client.connection.write(message)
@@ -65,7 +68,7 @@ function broadcast(message, excludeSocket = null) {
    }
 }
 
-function clearLine(socket) {
+function clearLine(socket: net.Socket) {
    // \x1B[A moves the cursor up one line.
    // \x1B[2K clears the entire line where the cursor is currently located.
    socket.write("\x1B[A\x1B[2K")

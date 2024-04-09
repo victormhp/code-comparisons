@@ -1,5 +1,5 @@
-const net = require("node:net")
-const readline = require("readline")
+import net from "node:net"
+import readline from "node:readline"
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -19,7 +19,7 @@ client.connect(PORT, HOST, () => {
     })
 })
 
-client.on('data', (data) => {
+client.on('data', (data: Buffer) => {
     console.log(`Received from server: ${data}`)
     client.destroy()
 })
@@ -28,6 +28,6 @@ client.on('close', () => {
     console.log('Connection closed')
 })
 
-client.on('error', (error) => {
+client.on('error', (error: Error) => {
     console.error("Error:", error)
 })

@@ -1,10 +1,10 @@
-const net = require("node:net")
+import net from "node:net"
 
 const PORT = 8080
 const server = net.createServer()
 
 server.on('connection', socket => {
-    socket.on('data', (data) => {
+    socket.on('data', (data: Buffer) => {
         console.log(`Data received from client: ${data}`);
         socket.write(`[*] Server echo: ${data}`);
     })
@@ -13,7 +13,7 @@ server.on('connection', socket => {
         console.log('[*] Client disconnected')
     })
 
-    socket.on('error', (error) => {
+    socket.on('error', (error: Error) => {
         console.error(`[*] Connection error: ${error}`)
     })
 })
