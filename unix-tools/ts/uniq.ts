@@ -1,8 +1,9 @@
 import fs from "node:fs"
 import readLine from "node:readline";
+import { type Readable } from "node:stream";
 
-export async function uniq(files) {
-    let counts = new Map();
+export async function uniq(files: string[]): Promise<void> {
+    let counts: Map<string, number> = new Map();
     if (files.length == 0) {
         await countLines(process.stdin, counts);
     } else {
@@ -24,7 +25,7 @@ export async function uniq(files) {
     }
 }
 
-async function countLines(stream, counts) {
+async function countLines(stream: Readable, counts: Map<string, number>) {
     const rl = readLine.createInterface({
         input: stream,
     })
