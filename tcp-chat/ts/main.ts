@@ -1,6 +1,6 @@
 import net from "node:net"
-import { Client } from "./client.ts"
-import { Message } from "./message.ts"
+import { Client } from "./client"
+import { Message } from "./message"
 
 const CMD_QUIT = "/quit"
 const PORT = 8080

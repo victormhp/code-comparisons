@@ -3,7 +3,7 @@ import net from "node:net"
 const PORT = 8080
 const server = net.createServer()
 
-server.on('connection', socket => {
+server.on('connection', (socket: net.Socket) => {
     socket.on('data', (data: Buffer) => {
         console.log(`Data received from client: ${data}`);
         socket.write(`[*] Server echo: ${data}`);

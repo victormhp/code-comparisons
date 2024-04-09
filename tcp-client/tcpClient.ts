@@ -13,7 +13,7 @@ const client = new net.Socket()
 
 client.connect(PORT, HOST, () => {
     console.log('Connected to the server')
-    rl.question("Message: ", (msg) => {
+    rl.question("Message: ", (msg: string) => {
         client.write(msg)
         rl.close()
     })
