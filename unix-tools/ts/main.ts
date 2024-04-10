@@ -1,4 +1,5 @@
-import { uniq } from "./uniq.js";
+import { uniq } from "./uniq";
+import { fetchAll, fetchUrl } from "./fetch";
 
 const [, , command, ...flags] = process.argv;
 if (!command) {
@@ -6,11 +7,21 @@ if (!command) {
     process.exit(1);
 }
 
-const CMD_QUIT = "-uniq";
+const CMD = {
+    uniq: "-uniq",
+    fetch: "-fetch",
+    fetchall: "-fetchall",
+}
 
 switch (command) {
-    case CMD_QUIT:
-        uniq(flags).catch(err => console.error(err));
+    case CMD.uniq:
+        uniq(flags);
+        break;
+    case CMD.fetch:
+        fetchUrl(flags);
+        break;
+    case CMD.fetchall:
+        fetchAll(flags);
         break;
     default:
         console.error("Unknown command!");
