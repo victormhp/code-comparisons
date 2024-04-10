@@ -28,7 +28,7 @@ func fetch(urls []string) {
 	}
 }
 
-func fetchall(urls []string) {
+func fetchAll(urls []string) {
 	start := time.Now()
 	ch := make(chan string)
 	for _, url := range urls {

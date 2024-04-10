@@ -26,7 +26,7 @@ func main() {
 	case CMD_FETCH:
 		fetch(flags)
 	case CMD_FETCHALL:
-		fetchall(flags)
+		fetchAll(flags)
 	default:
 		fmt.Printf("Unknown tool: %s\n", tool)
 		os.Exit(1)
