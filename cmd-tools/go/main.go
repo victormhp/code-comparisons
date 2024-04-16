@@ -1,34 +1,35 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
 
 const (
-	CMD_UNIQ     = "-uniq"
-	CMD_FETCH    = "-fetch"
-	CMD_FETCHALL = "-fetchall"
+	CMD_UNIQ     = "uniq"
+	CMD_FETCH    = "fetch"
+	CMD_FETCHALL = "fetchall"
 )
 
 func main() {
-	args := os.Args[1:]
+	cmd := flag.String("command", "", "Command Line Tool")
+	flag.Parse()
+	args := flag.Args()
 	if len(args) < 1 {
-		fmt.Println("Provide a unix command")
+		fmt.Println("Provide a command")
 		os.Exit(1)
 	}
 
-	tool := args[0]
-	flags := args[1:]
-	switch tool {
+	switch *cmd {
 	case CMD_UNIQ:
-		uniq(flags)
+		uniq(args)
 	case CMD_FETCH:
-		fetch(flags)
+		fetch(args)
 	case CMD_FETCHALL:
-		fetchAll(flags)
+		fetchAll(args)
 	default:
-		fmt.Printf("Unknown tool: %s\n", tool)
+		fmt.Printf("Unknown tool: %s\n", *cmd)
 		os.Exit(1)
 	}
 }
