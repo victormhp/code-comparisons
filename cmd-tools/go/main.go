@@ -11,6 +11,7 @@ const (
 	CMD_FETCH    = "fetch"
 	CMD_FETCHALL = "fetchall"
 	CMD_POPCOUNT = "popcount"
+	CMD_BASENAME = "basename"
 )
 
 func main() {
@@ -31,6 +32,8 @@ func main() {
 		fetchAll(args)
 	case CMD_POPCOUNT:
 		readPopCount(args)
+	case CMD_BASENAME:
+		basename(args[0])
 	default:
 		fmt.Printf("Unknown tool: %s\n", *cmd)
 		os.Exit(1)
