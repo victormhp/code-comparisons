@@ -10,5 +10,3 @@ A direct comparison of common programming tasks implemented in various programmi
 - TCP Server
 - TCP Client
 - TCP Chats
-- Command Line Tools
-- Problems
