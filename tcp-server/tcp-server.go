@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"net"
 )
@@ -12,29 +13,40 @@ const (
 )
 
 func main() {
-	listener, err := net.Listen(CONN_TYPE, CONN_PORT)
+	ln, err := net.Listen(CONN_TYPE, CONN_PORT)
 	if err != nil {
 		log.Fatalf("Error: %s", err.Error())
 	}
-	defer listener.Close()
+	defer ln.Close()
 
 	log.Println("Server listening on", CONN_PORT)
+
 	for {
-		conn, err := listener.Accept()
+		conn, err := ln.Accept()
 		if err != nil {
 			log.Println("Error trying to connect:", err.Error())
-			break
+			continue
 		}
 		log.Println("Accepted connection from", conn.RemoteAddr().String())
 
 		go func() {
-			msg, err := bufio.NewReader(conn).ReadString('\n')
-			if err != nil {
-				log.Println("Error sending message:", err.Error())
-			}
+			defer conn.Close()
 
-			log.Printf("%s -> %s", conn.RemoteAddr().String(), msg)
-			conn.Close()
+			for {
+				msg, err := bufio.NewReader(conn).ReadString('\n')
+				if err != nil {
+					log.Println("Error receiving message:", err.Error())
+					return
+				}
+				log.Printf("%s -> %s", conn.RemoteAddr().String(), msg)
+
+				response := fmt.Sprintf("Server received: %s", msg)
+				_, err = conn.Write([]byte(response))
+				if err != nil {
+					log.Println("Error writing response:", err.Error())
+					return
+				}
+			}
 		}()
 	}
 }
